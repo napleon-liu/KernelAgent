@@ -1,7 +1,0 @@
-OptimizationManager initialized: strategy=greedy, workers=1
-================================================================================
-STARTING OPTIMIZATION
-================================================================================
-GreedyStrategy initialized with 1 worker
-Initial kernel failed correctness verification: Verification failed after 0 refinement attempts:
-Test execution timed out after 30 seconds
