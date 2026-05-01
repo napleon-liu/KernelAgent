@@ -38,6 +38,11 @@ AVAILABLE_MODELS = [
         provider_classes=[OpenAIProvider],
         description="GPT-5.2 flagship model (Released Dec 2025)",
     ),
+    ModelConfig(
+        name="gpt-5.4",
+        provider_classes=[OpenAIProvider],
+        description="GPT-5.4 flagship model (Released Dec 2025)",
+    ),
     # Anthropic Claude 4 Models (Latest)
     ModelConfig(
         name="claude-opus-4-6",

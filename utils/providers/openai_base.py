@@ -16,16 +16,12 @@
 
 from typing import Any
 import logging
+import os
+
+import httpx
+
 from .base import BaseProvider, LLMResponse
 from .env_config import configure_proxy_environment
-
-try:
-    from openai import OpenAI
-
-    OPENAI_AVAILABLE = True
-except ImportError:
-    OPENAI_AVAILABLE = False
-    OpenAI = None
 
 
 class OpenAICompatibleProvider(BaseProvider):
@@ -33,25 +29,27 @@ class OpenAICompatibleProvider(BaseProvider):
 
     def __init__(self, api_key_env: str, base_url: str | None = None):
         self.api_key_env = api_key_env
-        self.base_url = base_url
+        self.base_url = base_url or os.getenv("OPENAI_BASE_URL")
         self._original_proxy_env = None
         super().__init__()
 
     def _initialize_client(self) -> None:
-        """Initialize OpenAI-compatible client."""
-        if not OPENAI_AVAILABLE:
+        """Initialize HTTP client for OpenAI-compatible API."""
+        api_key = self._get_api_key(self.api_key_env)
+        if not api_key:
             return
 
-        api_key = self._get_api_key(self.api_key_env)
-        if api_key:
-            # Configure proxy using centralized utility function
-            self._original_proxy_env = configure_proxy_environment()
+        # Configure proxy using centralized utility function
+        self._original_proxy_env = configure_proxy_environment()
 
-            # Initialize client (proxy configured via environment variables)
-            if self.base_url:
-                self.client = OpenAI(api_key=api_key, base_url=self.base_url)
-            else:
-                self.client = OpenAI(api_key=api_key)
+        self.client = httpx.Client(
+            base_url=(self.base_url or "https://api.openai.com/v1").rstrip("/") + "/",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            timeout=httpx.Timeout(600.0),
+        )
 
     def get_response(
         self, model_name: str, messages: list[dict[str, str]], **kwargs
@@ -61,20 +59,15 @@ class OpenAICompatibleProvider(BaseProvider):
             raise RuntimeError(f"{self.name} client not available")
 
         api_params = self._build_api_params(model_name, messages, **kwargs)
-        response = self.client.chat.completions.create(**api_params)
+        response = self.client.post("chat/completions", json=api_params)
+        response.raise_for_status()
+        payload = response.json()
         logging.getLogger(__name__).info(
-            "OpenAI chat response (single): %s",
-            getattr(response, "model_dump", lambda: str(response))(),
+            "OpenAI-compatible chat response (single): %s",
+            payload,
         )
 
-        return LLMResponse(
-            content=response.choices[0].message.content,
-            model=model_name,
-            provider=self.name,
-            usage=response.usage.dict()
-            if hasattr(response, "usage") and response.usage
-            else None,
-        )
+        return self._build_llm_response(model_name, payload)
 
     def get_multiple_responses(
         self, model_name: str, messages: list[dict[str, str]], n: int = 1, **kwargs
@@ -84,22 +77,25 @@ class OpenAICompatibleProvider(BaseProvider):
             raise RuntimeError(f"{self.name} client not available")
 
         api_params = self._build_api_params(model_name, messages, n=n, **kwargs)
-        response = self.client.chat.completions.create(**api_params)
+        response = self.client.post("chat/completions", json=api_params)
+        response.raise_for_status()
+        payload = response.json()
         logging.getLogger(__name__).info(
-            "OpenAI chat response (multi): %s",
-            getattr(response, "model_dump", lambda: str(response))(),
+            "OpenAI-compatible chat response (multi): %s",
+            payload,
         )
 
+        usage = payload.get("usage")
+        response_id = payload.get("id")
         return [
             LLMResponse(
-                content=choice.message.content,
+                content=choice["message"]["content"],
                 model=model_name,
                 provider=self.name,
-                usage=response.usage.dict()
-                if hasattr(response, "usage") and response.usage
-                else None,
+                usage=usage,
+                response_id=response_id,
             )
-            for choice in response.choices
+            for choice in payload.get("choices", [])
         ]
 
     def _build_api_params(
@@ -128,19 +124,29 @@ class OpenAICompatibleProvider(BaseProvider):
         if "n" in kwargs:
             params["n"] = kwargs["n"]
 
-        # Auto-enable high reasoning for GPT-5
-        if model_name.startswith("gpt-5"):
-            params["reasoning_effort"] = "high"
-        elif kwargs.get("high_reasoning_effort") and model_name.startswith(
-            ("o3", "o1")
+        # Keep reasoning effort conservative on reasoning-capable models to
+        # reduce gateway timeouts on OpenAI-compatible backends.
+        if kwargs.get("high_reasoning_effort") and model_name.startswith(
+            ("gpt-5", "o3", "o1")
         ):
-            params["reasoning_effort"] = "high"
+            params["reasoning_effort"] = "medium"
 
         return params
 
+    def _build_llm_response(self, model_name: str, payload: dict[str, Any]) -> LLMResponse:
+        """Convert OpenAI-compatible JSON payload into an LLMResponse."""
+        choice = payload["choices"][0]
+        return LLMResponse(
+            content=choice["message"]["content"],
+            model=model_name,
+            provider=self.name,
+            usage=payload.get("usage"),
+            response_id=payload.get("id"),
+        )
+
     def is_available(self) -> bool:
         """Check if provider is available."""
-        return OPENAI_AVAILABLE and self.client is not None
+        return self.client is not None
 
     def supports_multiple_completions(self) -> bool:
         """OpenAI-compatible APIs support native multiple completions."""

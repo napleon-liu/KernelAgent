@@ -60,6 +60,8 @@ class TritonKernelAgent:
         # Load environment variables
         load_dotenv()
 
+        # from ipdb import set_trace; set_trace()
+
         # Load configuration from environment
         self.num_workers = num_workers or int(os.getenv("NUM_KERNEL_SEEDS", "4"))
         self.max_rounds = max_rounds or int(os.getenv("MAX_REFINEMENT_ROUNDS", "10"))
@@ -227,6 +229,7 @@ class TritonKernelAgent:
         Returns:
             Generated test code in standardized format
         """
+        # from ipdb import set_trace; set_trace
         # Use LLM provider if available; no mock fallback allowed
         if not self.provider:
             raise RuntimeError(
@@ -245,7 +248,7 @@ class TritonKernelAgent:
 
                 # Call LLM API
                 messages = [{"role": "user", "content": prompt}]
-                response_text = self._call_llm(messages, max_tokens=24000)
+                response_text = self._call_llm(messages, max_tokens=6000)
                 self.logger.info("Raw test generation response:\n%s", response_text)
 
                 # Extract test code from response
@@ -369,7 +372,7 @@ if __name__ == "__main__":
                 messages = [{"role": "user", "content": prompt}]
 
                 # Use provider's multiple response capability
-                max_completion_tokens = 20000
+                max_completion_tokens = 10000
 
                 if self.provider.supports_multiple_completions():
                     # Provider supports native multiple completions
@@ -487,6 +490,7 @@ def kernel_function(*args, **kwargs):
         self.logger.info(f"Problem: {problem_description[:100]}...")
 
         # Normalize test_code to list[str]
+        # from ipdb import set_trace; set_trace()
         test_code_list: list[str] = []
         if generate_default_test:
             generated = self._generate_test(problem_description, None)
