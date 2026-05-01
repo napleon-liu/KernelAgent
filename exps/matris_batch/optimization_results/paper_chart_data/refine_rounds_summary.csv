@@ -1,0 +1,3 @@
+variant,success_count,mean_rounds,median_rounds,min_rounds,max_rounds
+with_fx,27,1.481,1,1,4
+without_fx,25,2.2,1,1,8

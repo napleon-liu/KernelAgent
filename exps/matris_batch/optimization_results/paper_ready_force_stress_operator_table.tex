@@ -1,0 +1,17 @@
+\begin{table}[t]
+\centering
+\caption{Generation and optimization results for representative force/stress second-order operators. These kernels validate second-order operator generation, but are not yet integrated into the full MatRIS force autograd path.}
+\label{tab:force-stress-operators}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+Operator & FX init. & No-FX init. & FX refine & No-FX refine & Speedup vs Eager & Speedup vs Compile \\
+\midrule
+energy\_to\_force & yes & yes & yes & yes & 1.07$\times$ & 1.00$\times$ \\
+energy\_to\_stress & yes & no & yes & yes & 1.54$\times$ & 0.95$\times$ \\
+force\_loss & yes & no & yes & yes & 1.56$\times$ & 0.63$\times$ \\
+stress\_loss & no & yes & yes & yes & 1.57$\times$ & 0.60$\times$ \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}

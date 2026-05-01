@@ -1,0 +1,16 @@
+{
+  "model_name": "gpt-5.4",
+  "high_reasoning_effort": false,
+  "num_workers": 1,
+  "initial_rounds": 1,
+  "refine_rounds": 8,
+  "test_timeout_s": 60,
+  "copy_sessions": true,
+  "hessian": {
+    "mode": "diagonal",
+    "device": "cpu",
+    "dtype": "float32"
+  },
+  "variants": ["with_fx", "without_fx"],
+  "refinement_policy": "rerun_same_prompt_with_more_rounds"
+}

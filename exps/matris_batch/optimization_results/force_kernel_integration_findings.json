@@ -1,0 +1,28 @@
+{
+  "title": "MatRIS force kernel integration findings",
+  "date": "2026-05-01",
+  "summary": "Current generated Triton integration only routes fused_silu, fused_sigmoid, and optional residual_add. Force-related kernels have not been integrated into the real MatRIS force/stress path.",
+  "current_integrated_kernels": [
+    "fused_silu",
+    "fused_sigmoid",
+    "residual_add_optional"
+  ],
+  "missing_real_force_integration": true,
+  "why_energy_to_force_was_not_imported": {
+    "generated_kernel_path": "exps/matris_batch/optimization_inputs/energy_to_force/optimized_kernel_greedy.py",
+    "generated_kernel_semantics": "forward(pos) = -2 * pos; backward(grad_out) = -2 * grad_out; double_backward = zeros_like(pos)",
+    "real_matris_force_semantics": "force = -d(total_energy)/d(batch_cart_coords), computed by torch.autograd.grad over the full MatRIS energy graph",
+    "reason": "The generated energy_to_force kernel is a toy representative for a quadratic energy case, not a general replacement for the real MatRIS force autograd path. Directly importing it would be semantically incorrect."
+  },
+  "real_force_path": {
+    "file": "MatRIS/matris/model/readout.py",
+    "class": "ForceStressHead",
+    "logic": "torch.autograd.grad(total_energy.sum(), [batch_cart_coords, batch_strains], create_graph=is_training, retain_graph=is_training); force = -grad[0]; stress = grad[1] * scale"
+  },
+  "recommended_next_steps": [
+    "Add correct small generated kernels for force_negate and stress_scale, replacing only force = -grad[0] and stress scaling.",
+    "Regenerate real MatRIS force/stress subgraph kernels rather than using the toy energy_to_force kernel.",
+    "Prioritize dynamic-size Dimwise_softmax, aggregate/index_add, scatter/gather kernels because they dominate ef/efs/efsm workloads and force backprop paths."
+  ],
+  "paper_implication": "Current generated activation kernels are insufficient for paper-level speedup on real ef/efs/efsm workloads. Force path and graph aggregation kernels need real integration before reporting positive acceleration results."
+}

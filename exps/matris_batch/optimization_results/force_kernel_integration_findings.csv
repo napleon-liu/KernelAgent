@@ -1,0 +1,15 @@
+item,value
+summary,"Current generated Triton integration only routes fused_silu, fused_sigmoid, and optional residual_add. Force-related kernels have not been integrated into the real MatRIS force/stress path."
+current_integrated_kernels,"fused_silu; fused_sigmoid; residual_add_optional"
+missing_real_force_integration,true
+generated_energy_to_force_path,"exps/matris_batch/optimization_inputs/energy_to_force/optimized_kernel_greedy.py"
+generated_energy_to_force_semantics,"forward(pos) = -2 * pos; backward(grad_out) = -2 * grad_out; double_backward = zeros_like(pos)"
+real_matris_force_semantics,"force = -d(total_energy)/d(batch_cart_coords), computed by torch.autograd.grad over the full MatRIS energy graph"
+why_not_directly_import,"The generated energy_to_force kernel is a toy representative for a quadratic energy case, not a general replacement for the real MatRIS force autograd path. Directly importing it would be semantically incorrect."
+real_force_path_file,"MatRIS/matris/model/readout.py"
+real_force_path_class,"ForceStressHead"
+real_force_path_logic,"torch.autograd.grad(total_energy.sum(), [batch_cart_coords, batch_strains], create_graph=is_training, retain_graph=is_training); force = -grad[0]; stress = grad[1] * scale"
+next_step_1,"Add correct small generated kernels for force_negate and stress_scale, replacing only force = -grad[0] and stress scaling."
+next_step_2,"Regenerate real MatRIS force/stress subgraph kernels rather than using the toy energy_to_force kernel."
+next_step_3,"Prioritize dynamic-size Dimwise_softmax, aggregate/index_add, scatter/gather kernels because they dominate ef/efs/efsm workloads and force backprop paths."
+paper_implication,"Current generated activation kernels are insufficient for paper-level speedup on real ef/efs/efsm workloads. Force path and graph aggregation kernels need real integration before reporting positive acceleration results."

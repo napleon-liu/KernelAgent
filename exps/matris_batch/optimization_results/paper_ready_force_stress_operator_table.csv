@@ -1,0 +1,5 @@
+operator,with_fx_initial,without_fx_initial,with_fx_after_refinement,without_fx_after_refinement,optimized_kernel_ms,speedup_vs_torch_eager,speedup_vs_torch_compile,interpretation
+energy_to_force,success,success,success,success,0.0035,1.07x,1.00x,Representative force operator; generated kernel is correct for the extracted toy second-order case but is not yet integrated into the full MatRIS force autograd path.
+energy_to_stress,success,fail,success,success,0.0039,1.54x,0.95x,Representative stress operator; benefits over eager but not over compile.
+force_loss,success,fail,success,success,0.0060,1.56x,0.63x,Force-loss second-order kernel shows eager speedup but compile remains faster.
+stress_loss,fail,success,success,success,0.0060,1.57x,0.60x,Stress-loss second-order kernel shows eager speedup but compile remains faster.

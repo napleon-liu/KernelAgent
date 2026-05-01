@@ -1,0 +1,5 @@
+phase,variant,success,total,success_rate
+initial,with_fx,16,33,0.4848
+initial,without_fx,14,33,0.4242
+refine,with_fx,27,33,0.8182
+refine,without_fx,25,33,0.7576

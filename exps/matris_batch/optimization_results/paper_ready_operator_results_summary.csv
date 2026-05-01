@@ -1,0 +1,22 @@
+metric,value,interpretation
+Total operators,33,MatRIS operator suite used for generation evaluation.
+With FX initial success,16/33 = 48.5%,FX/Hessian context improves initial generation over no-FX.
+Without FX initial success,14/33 = 42.4%,Baseline prompt without FX code.
+With FX after refinement,27/33 = 81.8%,Best generation setting.
+Without FX after refinement,25/33 = 75.8%,Refinement strongly improves no-FX as well.
+With FX success advantage after refinement,+6.1 percentage points,Modest but consistent improvement from FX code.
+With FX mean successful rounds,1.48,Successful with-FX cases require fewer refinement rounds.
+Without FX mean successful rounds,2.20,No-FX successful cases take more rounds on average.
+Hessian FX coverage,33/33 = 100%,All operators have diagonal Hessian FX artifacts.
+Optimization completed operators,27,Operators prepared for optimization from successful with-FX kernels.
+Optimization successful operators,12/27 = 44.4%,Strict optimization success including correctness and benchmark availability.
+Benchmarked optimized kernels,10,Kernels with complete eager/compile/best latency numbers.
+Faster than pre-optimization,9/10,Most benchmarked kernels improve over their generated pre-optimization version.
+Faster than torch.eager,10/10,All benchmarked optimized kernels beat torch.eager microbenchmarks.
+Faster than torch.compile,5/10,Only half beat torch.compile; compile is a strong baseline.
+Geomean speedup vs pre-optimization,1.34x,Overall optimization-loop gain.
+Geomean speedup vs torch.eager,1.56x,Main microbenchmark speedup claim.
+Geomean speedup vs torch.compile,1.10x,More conservative claim against compiler baseline.
+Best single operator speedup,segment_softmax: 6.81x vs torch.eager and 4.33x vs torch.compile,Best main-figure highlight.
+Force/stress generation after refinement,4/4 with FX and 4/4 without FX,All representative force/stress second-order operators can be generated after refinement.
+Force/stress caveat,not integrated into full MatRIS force autograd path,Do not claim end-to-end force/stress acceleration yet.

@@ -1,0 +1,6 @@
+tier,hessian_success,total,coverage_rate
+all,33,33,1.0
+P0,12,12,1.0
+P1,10,10,1.0
+P2,7,7,1.0
+force_stress,4,4,1.0

@@ -1,0 +1,21 @@
+\begin{table*}[t]
+\centering
+\caption{Microbenchmark performance of optimized generated kernels. Latency is reported in ms. Speedups are relative to the pre-optimization generated kernel, PyTorch eager, and torch.compile baselines.}
+\label{tab:kernel-optimization-speedup}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrrr}
+\toprule
+Operator & Category & Optimized & Pre-opt. & Eager & Compile & Speedup vs Eager & Speedup vs Compile \\
+\midrule
+segment\_softmax & graph reduction & 0.0039 & 0.0475 & 0.0267 & 0.0169 & 6.81$\times$ & 4.33$\times$ \\
+fused\_silu & elementwise & 0.0037 & 0.0038 & 0.0062 & 0.0055 & 1.67$\times$ & 1.49$\times$ \\
+edge\_feature\_fusion & graph message & 0.0035 & 0.0037 & 0.0055 & 0.0037 & 1.59$\times$ & 1.06$\times$ \\
+stress\_loss & force/stress & 0.0060 & 0.0062 & 0.0094 & 0.0036 & 1.57$\times$ & 0.60$\times$ \\
+force\_loss & force/stress & 0.0060 & 0.0062 & 0.0094 & 0.0038 & 1.56$\times$ & 0.63$\times$ \\
+energy\_to\_stress & force/stress & 0.0039 & 0.0036 & 0.0059 & 0.0037 & 1.54$\times$ & 0.95$\times$ \\
+\midrule
+Geomean over benchmarked kernels & -- & -- & -- & -- & -- & 1.56$\times$ & 1.10$\times$ \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}

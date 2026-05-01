@@ -1,0 +1,27 @@
+{
+  "operator_id": "gemm",
+  "completed": true,
+  "cmd": [
+    "/share/home/liuyao/miniconda3/envs/kernelagent/bin/python",
+    "/share/home/liuyao/workspace/KernelAgent/examples/run_opt_manager.py",
+    "--kernel-dir",
+    "/share/home/liuyao/workspace/KernelAgent/exps/matris_batch/optimization_inputs/gemm",
+    "--strategy",
+    "greedy",
+    "--max-rounds",
+    "5"
+  ],
+  "returncode": 0,
+  "success": false,
+  "error_kind": "initial_correctness_failed",
+  "best_time_ms": null,
+  "initial_time_ms": null,
+  "pytorch_time_ms": null,
+  "compile_time_ms": null,
+  "speedup_vs_initial": null,
+  "speedup_vs_pytorch": null,
+  "total_rounds": null,
+  "optimized_kernel": null,
+  "stdout_tail": "================================================================================\nOptimizationManager - Multi-Strategy Kernel Optimization\n================================================================================\nKernel file: /share/home/liuyao/workspace/KernelAgent/exps/matris_batch/optimization_inputs/gemm/input.py\nProblem file: /share/home/liuyao/workspace/KernelAgent/exps/matris_batch/optimization_inputs/gemm/problem.py\nStrategy: greedy\nMax rounds: 5\nLog directory: /share/home/liuyao/workspace/KernelAgent/exps/matris_batch/optimization_inputs/gemm/opt_manager_logs\n\n================================================================================\nGREEDY OPTIMIZATION\n================================================================================\nConfig: /share/home/liuyao/workspace/KernelAgent/examples/configs/greedy.yaml\n\n================================================================================\nGREEDY OPTIMIZATION FAILED\n================================================================================\nCheck logs for details\n",
+  "stderr_tail": "OptimizationManager initialized: strategy=greedy, workers=1\n================================================================================\nSTARTING OPTIMIZATION\n================================================================================\nGreedyStrategy initialized with 1 worker\nInitial kernel failed correctness verification: Verification failed after 0 refinement attempts:\nTest execution timed out after 30 seconds\n"
+}
