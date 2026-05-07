@@ -143,3 +143,18 @@ ehthumbs.db
 Thumbs.db
 # Local batch runner
 scripts/run_kernelbench_batch.py
+exps/matris_batch/artifacts/
+exps/matris_batch/optimization_inputs/
+exps/matris_batch/slurm/
+exps/matris_batch/templates/
+exps/matris_batch/runs/
+exps/matris_batch/scripts/
+.claude/
+.codebuddy/
+
+# External submodules / subprojects
+KernelBench/
+MatRIS/
+
+# Scratch / temp files
+2.1
